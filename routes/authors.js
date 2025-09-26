@@ -3,14 +3,15 @@ const router = express.Router()
 const Author = require('../models/author')
 
 // All Authors Route
+
 router.get('/', async (req, res) => {
     let searchOptions = {}
     if (req.query.name != null && req.query.name !== '') {
         searchOptions.name = new RegExp(req.query.name, 'i')
-        }
+    }
     try {
         const authors = await Author.find(searchOptions)
-        res.render('authors/index', {authors: authors})
+        res.render('authors/index', { authors: authors, searchOptions: req.query })
     } catch {
         res.redirect('/')
     }
@@ -23,17 +24,16 @@ router.get('/new', (req, res) => {
 
 // Create Author Route
 router.post('/', async (req, res) => {
-    const author = new Author({
+    const author = new Author ({
         name: req.body.name
     })
     try {
         const newAuthor = await author.save()
-        // res.redirect(`authors${newAuthor.id}`)
-        res.redirect(`authors`)
-    } catch {
+        res.redirect('/authors')
+    } catch (err) {
         res.render('authors/new', {
             author: author,
-            errorMessage: 'Error creating Author'
+            errorMessage: 'Error Creating Author...'
         })
     }
 })
